@@ -14,20 +14,6 @@ fetch("config/questions.json")
       container.innerHTML = "<p style='color:red;'>Fehler beim Laden des Fragebogens.</p>";
     }
   });
-// function renderQuestions() {
-//   const container = document.getElementById("questionnaire");
-//   container.innerHTML = "";
-
-//   questions.forEach((q, i) => {
-//     const qDiv = document.createElement("div");
-//     qDiv.innerHTML = `<p>${q.question}</p>`;
-//     q.scale.forEach((label, j) => {
-//       const input = `<label><input type="radio" name="q${i}" value="${j}">${label}</label>`;
-//       qDiv.innerHTML += input;
-//     });
-//     container.appendChild(qDiv);
-//   });
-// }
 
 function renderQuestions() {
   const container = document.getElementById("questionnaire");
