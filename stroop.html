@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reaktionsspiel & Fragebogen</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="questionnaire" class="card"></main>
+  <button id="start-game">Starte Reaktionsspiel</button>
+
+  <div id="game" class="hidden">
+    <div id="stimulus"></div>
+    <div id="touch-area">
+      <div id="left-touch"></div>
+      <div id="right-touch"></div>
+    </div>
+  </div>
+
+  <canvas id="result-graph" class="hidden"></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="stroop_game.js"></script>
+</body>
+</html>

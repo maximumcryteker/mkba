@@ -1,0 +1,105 @@
+[
+  {
+    "question": "Wie alt bist du?",
+    "type": "number",
+    "min": 12,
+    "max": 99
+  },
+  {
+    "question": "Geschlecht",
+    "type": "radio",
+    "options": ["M", "W", "D"]
+  },
+  {
+    "question": "Wie viele Stunden verbringst du pro Monat am Bildschirm (ca.)?",
+    "type": "number"
+  },
+  {
+    "question": "Welche drei Apps nutzt du am meisten?",
+    "type": "text"
+  },
+  {
+    "question": "Wie viele Stunden pro Woche verbringst du mit jeder dieser Apps?",
+    "type": "text"
+  },
+  {
+    "question": "Mir fallen Werbungen auf Social Media oft auf.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Ich erinnere mich an Werbungen von Social Media auch nach dem Scrollen.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Ich scrolle häufig auf Social Media, auch wenn ich nichts Bestimmtes suche.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Ich gehe auf Social Media, um neue Produkte zu finden.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Wie viele Käufe tätigst du durchschnittlich pro Monat über Social Media?",
+    "type": "number"
+  },
+  {
+    "question": "Wie viele dieser Käufe wurden durch Werbung ausgelöst?",
+    "type": "number"
+  },
+  {
+    "question": "Werbung auf Social Media beeinflusst meine Kaufentscheidungen.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Ich recherchiere Produkte, die ich auf Social Media sehe.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Social Media Werbung ist für mich unpersonalisiert und nicht relevant.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Ich vertraue Influencer-Werbung nicht.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Je mehr Zeit ich auf Social Media verbringe, desto wahrscheinlicher ist es, dass ich etwas kaufe.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Ich kann Versuchungen gut widerstehen.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Es fällt mir schwer, schlechte Angewohnheiten abzugewöhnen.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Ich tue Dinge, die Spaß machen, auch wenn sie mir schaden.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Ich lehne Dinge ab, die schlecht für mich sind.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Ich wünschte, ich hätte mehr Selbstdisziplin.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Vergnügen und Spaß halten mich nicht davon ab, meine Arbeit zu erledigen.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Es fällt mir schwer, mich zu konzentrieren.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Bestimmte Dinge kann ich nicht sein lassen, obwohl ich weiß, dass sie schlecht für mich sind.",
+    "scale": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "question": "Manchmal handle ich, ohne alle Alternativen abzuwägen.",
+    "scale": ["1", "2", "3", "4", "5"]
+  }
+]
