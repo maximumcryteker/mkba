@@ -1,4 +1,14 @@
+# extra fragebogen sachen
 fragebogen_script.js
 fragebogen.html
 
+#venv
 marlonba
+
+# node
+node_modules
+package-lock.json
+package.json
+
+# data
+data/*

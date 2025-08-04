@@ -170,3 +170,31 @@ function endGame() {
     body: JSON.stringify(data)
   });
 }
+
+function submitResults() {
+  const answers = {};
+
+  questions.forEach((q, i) => {
+    const name = `q${i}`;
+    const input = document.querySelector(`[name="${name}"]:checked`) || document.querySelector(`[name="${name}"]`);
+    answers[q.question] = input ? input.value : null;
+  });
+
+  const payload = {
+    timestamp: new Date().toISOString(),
+    questionnaire: answers,
+    taskResults: results  // ← This is your array of shape/color/etc.
+  };
+
+  fetch('/save-results', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+    .then(res => res.text())
+    .then(msg => alert(msg))
+    .catch(err => console.error('Error submitting results:', err));
+}
+
