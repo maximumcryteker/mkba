@@ -42,3 +42,6 @@ def save_results():
         return f"CSV save error: {str(e)}", 500
 
     return "Saved successfully"
+
+if __name__ == "__main__":
+    app.run(debug=True)

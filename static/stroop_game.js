@@ -55,6 +55,17 @@ document.getElementById("start-game").addEventListener("click", () => {
   startGame(answers);
 });
 
+function goToInstructions() {
+  // Hide questionnaire, show instructions
+  document.getElementById("questionnaire-section").style.display = "none";
+  document.getElementById("instructions-section").style.display = "block";
+}
+
+function onStartGameClick() {
+  document.getElementById("instructions-section").style.display = "none";
+  startGame();
+}
+
 function startGame(metadata) {
   const game = document.getElementById("game");
   game.classList.remove("hidden");
@@ -159,16 +170,17 @@ function endGame() {
     }
   });
 
-  const data = Object.assign({}, results[0], {
-    answers: JSON.stringify(results),
-    timestamp: new Date().toISOString()
-  });
+  // const data = Object.assign({}, results[0], {
+  //   answers: JSON.stringify(results),
+  //   timestamp: new Date().toISOString()
+  // });
 
-  fetch("/upload", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+  // fetch("/upload", {
+  //   method: "POST",
+  //   headers: { "Content-Type": "application/json" },
+  //   body: JSON.stringify(data)
+  // });
+  submitResults();
 }
 
 function submitResults() {

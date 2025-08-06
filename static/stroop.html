@@ -4,11 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reaktionsspiel & Fragebogen</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-  <main id="questionnaire" class="card"></main>
-  <button id="start-game">Starte Reaktionsspiel</button>
+  <!-- Questionnaire Section -->
+  <div id="questionnaire-section">
+    <div id="questionnaire" class="card"></div>
+    <button onclick="goToInstructions()">Weiter</button>
+  </div>
+
+  <!-- Instructions Section (initially hidden) -->
+  <div id="instructions-section" style="display:none;">
+    <h2>Reaktionsspiel Anleitung</h2>
+    <p>In diesem Spiel musst du möglichst schnell auf die gezeigten Farben reagieren. Drücke die richtige Taste, die zur Wortfarbe passt, nicht zum Wortinhalt.</p>
+    <button onclick="onStartGameClick()">Starte Reaktionsspiel</button>
+  </div>
 
   <div id="game" class="hidden">
     <div id="stimulus"></div>
@@ -20,7 +30,6 @@
 
   <canvas id="result-graph" class="hidden"></canvas>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="stroop_game.js"></script>
-  <button onclick="submitResults()">Absenden</button>
+  <script src="static/stroop_game.js"></script>
 </body>
 </html>
