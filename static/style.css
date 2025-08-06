@@ -51,3 +51,42 @@ button {
     display: none;
   }
 }
+
+#touch-area {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+
+.touch-box {
+  flex: 1;
+  height: 80px;
+  background-color: #f0f0f0;
+  text-align: center;
+  font-size: 2rem;
+  padding-top: 10px;
+  border-radius: 10px;
+  border: 2px solid #ccc;
+  user-select: none;
+  cursor: pointer;
+}
+
+.touch-box:hover {
+  background-color: #e0e0e0;
+}
+
+#response-reminder {
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;
+  margin-top: 1rem;
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.color-label {
+  font-weight: bold;
+  color: #444;
+}
