@@ -1,8 +1,14 @@
-from flask import Flask, request, jsonify
+import os
+from flask import Flask, request, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
+DATA_FOLDER = 'data'
+
+if not os.path.exists(DATA_FOLDER):
+    os.makedirs(DATA_FOLDER)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydatabase.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -26,6 +32,14 @@ class StroopResult(db.Model):
 # Create tables if not exist
 with app.app_context():
     db.create_all()
+
+@app.route('/')
+def index():
+    return send_from_directory('static', 'stroop.html')
+
+@app.route('/config/<path:filename>')
+def send_config(filename):
+    return send_from_directory('config', filename)
 
 @app.route("/upload_all", methods=["POST"])
 def upload_all():
