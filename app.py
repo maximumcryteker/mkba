@@ -1,47 +1,65 @@
-from flask import Flask, request, send_from_directory, jsonify
-import os
-import json
-import csv
+from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-app = Flask(__name__, static_folder='static')
-DATA_FOLDER = 'data'
+app = Flask(__name__)
 
-if not os.path.exists(DATA_FOLDER):
-    os.makedirs(DATA_FOLDER)
+# PythonAnywhere MySQL config
+USERNAME = "maximumcryteker"
+PASSWORD = "MKBA1MKBA1"
+HOST = "maximumcryteker.mysql.pythonanywhere-services.com"
+DBNAME = "maximumcryteker$mkba_database"
 
-@app.route('/')
-def index():
-    return send_from_directory('static', 'stroop.html')
+app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+pymysql://{USERNAME}:{PASSWORD}@{HOST}/{DBNAME}"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-@app.route('/config/<path:filename>')
-def send_config(filename):
-    return send_from_directory('config', filename)
+db = SQLAlchemy(app)
 
-@app.route('/save-results', methods=['POST'])
-def save_results():
+# Table for questionnaire answers
+class QuestionnaireResponse(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.now)
+    answers_json = db.Column(db.Text)  # store as JSON string
+
+# Table for Stroop game results
+class StroopResult(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    questionnaire_id = db.Column(db.Integer, db.ForeignKey("questionnaire_response.id"), nullable=False)
+    shape = db.Column(db.String(50))
+    color = db.Column(db.String(50))
+    key = db.Column(db.String(10))
+    time = db.Column(db.Float)
+    correct = db.Column(db.Boolean)
+
+# Create tables if not exist
+with app.app_context():
+    db.create_all()
+
+@app.route("/upload_all", methods=["POST"])
+def upload_all():
     data = request.get_json()
+    questionnaire = data.get("questionnaire", {})
+    results = data.get("results", [])
 
-    timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-    json_filename = os.path.join(DATA_FOLDER, f"results_{timestamp}.json")
-    csv_filename = os.path.join(DATA_FOLDER, f"results_{timestamp}.csv")
+    # Save questionnaire answers
+    q_entry = QuestionnaireResponse(answers_json=str(questionnaire))
+    db.session.add(q_entry)
+    db.session.commit()  # commit so q_entry.id is available
 
-    # Save JSON
-    with open(json_filename, 'w') as f_json:
-        json.dump(data, f_json, indent=2)
+    # Save Stroop results linked to questionnaire
+    for r in results:
+        entry = StroopResult(
+            questionnaire_id=q_entry.id,
+            shape=r.get("shape"),
+            color=r.get("color"),
+            key=r.get("key"),
+            time=r.get("time"),
+            correct=r.get("correct")
+        )
+        db.session.add(entry)
 
-    # Save CSV (taskResults only)
-    try:
-        with open(csv_filename, 'w', newline='') as f_csv:
-            writer = csv.DictWriter(f_csv, fieldnames=['timestamp', 'shape', 'color', 'key', 'time', 'correct'])
-            writer.writeheader()
-            for row in data.get('taskResults', []):
-                row['timestamp'] = data.get('timestamp')
-                writer.writerow(row)
-    except Exception as e:
-        return f"CSV save error: {str(e)}", 500
-
-    return "Saved successfully"
+    db.session.commit()
+    return jsonify({"status": "success", "questionnaire_id": q_entry.id}), 201
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

@@ -5,6 +5,9 @@ fragebogen.html
 #venv
 marlonba
 
+# env
+.env
+
 # node
 node_modules
 package-lock.json

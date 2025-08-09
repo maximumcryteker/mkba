@@ -182,43 +182,36 @@ function endGame() {
     }
   });
 
-  // const data = Object.assign({}, results[0], {
-  //   answers: JSON.stringify(results),
-  //   timestamp: new Date().toISOString()
-  // });
-
-  // fetch("/upload", {
-  //   method: "POST",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify(data)
-  // });
   submitResults();
 }
 
 function submitResults() {
   const answers = {};
 
+  // Collect answers from the questionnaire
   questions.forEach((q, i) => {
     const name = `q${i}`;
     const input = document.querySelector(`[name="${name}"]:checked`) || document.querySelector(`[name="${name}"]`);
     answers[q.question] = input ? input.value : null;
   });
 
+  // Build payload for Flask backend
   const payload = {
-    timestamp: new Date().toISOString(),
-    questionnaire: answers,
-    taskResults: results  // ← This is your array of shape/color/etc.
+    questionnaire: answers,  // all questionnaire responses
+    results: results         // all Stroop game trials
   };
 
-  fetch('/save-results', {
+  // Send everything to Flask endpoint
+  fetch('/upload_all', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   })
-    .then(res => res.text())
-    .then(msg => alert(msg))
+    .then(res => res.json())
+    .then(data => {
+      console.log('Results saved with questionnaire_id:', data.questionnaire_id);
+      alert('Danke! Deine Antworten wurden gespeichert.');
+    })
     .catch(err => console.error('Error submitting results:', err));
 }
 
