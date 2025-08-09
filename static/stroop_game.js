@@ -79,6 +79,12 @@ function startGame(metadata) {
   const startTime = Date.now();
   const endTime = startTime + 60000;
 
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (!isMobile) {
+    // Hide touch controls on desktop
+    document.getElementById("touch-area").style.display = "none";
+  }
+
   let timeout;
   function nextTrial() {
     const now = Date.now();
@@ -89,7 +95,10 @@ function startGame(metadata) {
 
     stimulus.style.backgroundColor = color;
     stimulus.style.borderRadius = shape === "circle" ? "50%" : "0";
-    stimulus.style.clipPath = shape === "triangle" ? "polygon(50% 0%, 0% 100%, 100% 100%)" : "none";
+    stimulus.style.clipPath =
+      shape === "triangle"
+        ? "polygon(50% 0%, 0% 100%, 100% 100%)"
+        : "none";
 
     const correctKey = (color === "white" || color === "red") ? "1" : "2";
     const shownAt = Date.now();
@@ -106,21 +115,24 @@ function startGame(metadata) {
       if (e.key === "1" || e.key === "2") handleResponse(e.key);
     }
 
-    function onTouch(e) {
-      const x = e.touches[0].clientX;
-      const half = window.innerWidth / 2;
-      handleResponse(x < half ? "1" : "2");
+    function onTouch() {
+      handleResponse(this.id === "left-touch" ? "1" : "2");
     }
 
     function cleanup() {
       document.removeEventListener("keydown", onKey);
       left.removeEventListener("touchstart", onTouch);
       right.removeEventListener("touchstart", onTouch);
+      left.removeEventListener("click", onTouch);
+      right.removeEventListener("click", onTouch);
     }
 
-    document.addEventListener("keydown", onKey);
-    left.addEventListener("touchstart", onTouch);
-    right.addEventListener("touchstart", onTouch);
+    if (isMobile) {
+      left.addEventListener("touchstart", onTouch);
+      right.addEventListener("touchstart", onTouch);
+    } else {
+      document.addEventListener("keydown", onKey);
+    }
   }
 
   nextTrial();
