@@ -9,8 +9,15 @@ DATA_FOLDER = 'data'
 if not os.path.exists(DATA_FOLDER):
     os.makedirs(DATA_FOLDER)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydatabase.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# PythonAnywhere MySQL config
+USERNAME = "maximumcryteker"
+PASSWORD = "MKBA1MKBA1"
+HOST = "maximumcryteker.mysql.pythonanywhere-services.com"
+DBNAME = "maximumcryteker$mkba_database"
+
+app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql://{USERNAME}:{PASSWORD}@{HOST}/{DBNAME}"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 db = SQLAlchemy(app)
 
 # Table for questionnaire answers
