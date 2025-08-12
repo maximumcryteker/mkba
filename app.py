@@ -1,5 +1,7 @@
 import os
-from flask import Flask, request, jsonify, send_from_directory
+import json
+from sqlalchemy import text
+from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -23,7 +25,7 @@ db = SQLAlchemy(app)
 # Table for questionnaire answers
 class QuestionnaireResponse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.now)
+    timestamp = db.Column(db.String(50))
     answers_json = db.Column(db.Text)  # store as JSON string
 
 # Table for Stroop game results
@@ -55,7 +57,10 @@ def upload_all():
     results = data.get("results", [])
 
     # Save questionnaire answers
-    q_entry = QuestionnaireResponse(answers_json=str(questionnaire))
+    q_entry = QuestionnaireResponse(
+        timestamp=datetime.now().isoformat(),
+        answers_json=json.dumps(questionnaire, ensure_ascii=False)
+    )
     db.session.add(q_entry)
     db.session.commit()  # commit so q_entry.id is available
 
@@ -73,6 +78,31 @@ def upload_all():
 
     db.session.commit()
     return jsonify({"status": "success", "questionnaire_id": q_entry.id}), 201
+
+@app.route("/export-csv")
+def export_csv():
+    responses = QuestionnaireResponse.query.all()
+    
+    # Get all unique question keys from all rows
+    all_questions = set()
+    for r in responses:
+        ans = json.loads(r.answers_json)
+        all_questions.update(ans.keys())
+    all_questions = sorted(all_questions)
+
+    # Create CSV dynamically
+    def generate():
+        # header
+        yield ",".join(["id", "timestamp"] + all_questions) + "\n"
+        # rows
+        for r in responses:
+            ans = json.loads(r.answers_json)
+            row = [str(r.id), r.timestamp] + [ans.get(q, "") for q in all_questions]
+            yield ",".join(row) + "\n"
+
+    date = datetime.now()
+    return Response(generate(), mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment;filename=combined_results_{date}.csv"})
 
 if __name__ == "__main__":
     app.run()
