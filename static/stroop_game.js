@@ -56,6 +56,30 @@ document.getElementById("start-game").addEventListener("click", () => {
 });
 
 function goToInstructions() {
+  let allAnswered = true;
+
+  questions.forEach((q, i) => {
+    const name = `q${i}`;
+    const inputs = document.querySelectorAll(`[name="${name}"]`);
+
+    let answered = false;
+    if (q.type === "radio" || q.scale) {
+        answered = Array.from(inputs).some(input => input.checked);
+    } else {
+        answered = inputs[0] && inputs[0].value.trim() !== "";
+    }
+
+    if (!answered) {
+        allAnswered = false;
+    }
+  });
+
+  if (!allAnswered) {
+    alert("Bitte beantworten Sie alle Fragen, bevor Sie fortfahren.");
+    return; // ❌ Stop here
+  }
+
+  // ✅ All questions answered → go to instructions
   // Hide questionnaire, show instructions
   document.getElementById("questionnaire-section").style.display = "none";
   document.getElementById("instructions-section").style.display = "block";
