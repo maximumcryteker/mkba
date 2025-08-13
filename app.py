@@ -85,68 +85,62 @@ def upload_all():
 def export_csv():
     responses = QuestionnaireResponse.query.all()
 
-    # Gather all unique questionnaire questions
+    # Get all unique questionnaire question keys
     all_questions = set()
     max_game_trials = 0
+    stroop_by_qid = {}  # Map questionnaire_id -> list of trials
+
     for r in responses:
+        # Parse questionnaire
         try:
             ans = json.loads(r.answers_json) if r.answers_json else {}
             all_questions.update(ans.keys())
-
-            game = json.loads(r.game_results_json) if r.game_results_json else []
-            max_game_trials = max(max_game_trials, len(game))
         except Exception as e:
-            print(f"Error parsing row {r.id}: {e}")
+            print(f"Error parsing answers for row {r.id}: {e}")
+            ans = {}
+
+        # Fetch stroop results linked to this questionnaire
+        trials = StroopResult.query.filter_by(questionnaire_id=r.id).all()
+        stroop_by_qid[r.id] = trials
+        max_game_trials = max(max_game_trials, len(trials))
 
     all_questions = sorted(all_questions)
 
-    # Create headers
+    # Create CSV headers
     headers = ["id", "timestamp"] + all_questions
     for i in range(1, max_game_trials + 1):
         headers += [
             f"trial{i}_shape",
             f"trial{i}_color",
+            f"trial{i}_key",
             f"trial{i}_time",
             f"trial{i}_correct"
         ]
 
-    # Prepare CSV in memory
+    # Write CSV
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(headers)
 
-    # Fill rows
     for r in responses:
-        try:
-            ans = json.loads(r.answers_json) if r.answers_json else {}
-            game = json.loads(r.game_results_json) if r.game_results_json else []
+        ans = json.loads(r.answers_json) if r.answers_json else {}
+        row = [r.id, r.timestamp]
+        row += [ans.get(q, "") for q in all_questions]
 
-            row = [r.id, r.timestamp]
-            # Add questionnaire answers
-            row += [ans.get(q, "") for q in all_questions]
+        trials = stroop_by_qid.get(r.id, [])
+        for i in range(max_game_trials):
+            if i < len(trials):
+                t = trials[i]
+                row += [t.shape, t.color, t.key, t.time, t.correct]
+            else:
+                row += ["", "", "", "", ""]
 
-            # Add Stroop results (empty strings if fewer than max_game_trials)
-            for i in range(max_game_trials):
-                if i < len(game):
-                    trial = game[i]
-                    row += [
-                        trial.get("shape", ""),
-                        trial.get("color", ""),
-                        trial.get("time", ""),
-                        trial.get("correct", "")
-                    ]
-                else:
-                    row += ["", "", "", ""]
-
-            writer.writerow(row)
-
-        except Exception as e:
-            print(f"Skipping row {r.id} due to error: {e}")
+        writer.writerow(row)
 
     csv_data = output.getvalue()
     output.close()
 
-    date = datetime.now()
+    date = datetime.now().strftime("%Y%m%d_%H%M%S")
     return Response(
         csv_data,
         mimetype="text/csv",
