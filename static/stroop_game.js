@@ -20,23 +20,23 @@ function renderQuestions() {
   container.innerHTML = "";
 
   questions.forEach((q, i) => {
-    const qDiv = document.createElement("div");
-    qDiv.innerHTML = `<p>${q.question}</p>`;
+  const qDiv = document.createElement("div");
+  qDiv.innerHTML = `<p>${q.question}</p>`;
 
-    if (q.type === "radio" && q.options) {
+  if (q.type === "radio" && q.options) {
       q.options.forEach((opt, j) => {
-        const input = `<label><input type="radio" name="q${i}" value="${opt}">${opt}</label>`;
-        qDiv.innerHTML += input;
+          const input = `<label><input type="radio" name="q${i}" value="${opt}" required>${opt}</label>`;
+          qDiv.innerHTML += input;
       });
     } else if (q.type === "number") {
-      qDiv.innerHTML += `<input type="number" name="q${i}" min="${q.min || ''}" max="${q.max || ''}">`;
+        qDiv.innerHTML += `<input type="number" name="q${i}" min="${q.min || ''}" max="${q.max || ''}" required>`;
     } else if (q.type === "text") {
-      qDiv.innerHTML += `<input type="text" name="q${i}">`;
+        qDiv.innerHTML += `<input type="text" name="q${i}" required>`;
     } else if (q.scale) {
-      q.scale.forEach((label, j) => {
-        const input = `<label><input type="radio" name="q${i}" value="${j}">${label}</label>`;
-        qDiv.innerHTML += input;
-      });
+        q.scale.forEach((label, j) => {
+            const input = `<label><input type="radio" name="q${i}" value="${j}" required>${label}</label>`;
+            qDiv.innerHTML += input;
+        });
     }
 
     container.appendChild(qDiv);
