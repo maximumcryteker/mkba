@@ -1,5 +1,7 @@
 import os
 import json
+import io
+import csv
 from sqlalchemy import text
 from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_sqlalchemy import SQLAlchemy
@@ -25,7 +27,7 @@ db = SQLAlchemy(app)
 # Table for questionnaire answers
 class QuestionnaireResponse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.String(50))
+    timestamp = db.Column(db.DateTime, default=datetime.now)
     answers_json = db.Column(db.Text)  # store as JSON string
 
 # Table for Stroop game results
@@ -82,27 +84,74 @@ def upload_all():
 @app.route("/export-csv")
 def export_csv():
     responses = QuestionnaireResponse.query.all()
-    
-    # Get all unique question keys from all rows
+
+    # Gather all unique questionnaire questions
     all_questions = set()
+    max_game_trials = 0
     for r in responses:
-        ans = json.loads(r.answers_json)
-        all_questions.update(ans.keys())
+        try:
+            ans = json.loads(r.answers_json) if r.answers_json else {}
+            all_questions.update(ans.keys())
+
+            game = json.loads(r.game_results_json) if r.game_results_json else []
+            max_game_trials = max(max_game_trials, len(game))
+        except Exception as e:
+            print(f"Error parsing row {r.id}: {e}")
+
     all_questions = sorted(all_questions)
 
-    # Create CSV dynamically
-    def generate():
-        # header
-        yield ",".join(["id", "timestamp"] + all_questions) + "\n"
-        # rows
-        for r in responses:
-            ans = json.loads(r.answers_json)
-            row = [str(r.id), r.timestamp] + [ans.get(q, "") for q in all_questions]
-            yield ",".join(row) + "\n"
+    # Create headers
+    headers = ["id", "timestamp"] + all_questions
+    for i in range(1, max_game_trials + 1):
+        headers += [
+            f"trial{i}_shape",
+            f"trial{i}_color",
+            f"trial{i}_time",
+            f"trial{i}_correct"
+        ]
+
+    # Prepare CSV in memory
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(headers)
+
+    # Fill rows
+    for r in responses:
+        try:
+            ans = json.loads(r.answers_json) if r.answers_json else {}
+            game = json.loads(r.game_results_json) if r.game_results_json else []
+
+            row = [r.id, r.timestamp]
+            # Add questionnaire answers
+            row += [ans.get(q, "") for q in all_questions]
+
+            # Add Stroop results (empty strings if fewer than max_game_trials)
+            for i in range(max_game_trials):
+                if i < len(game):
+                    trial = game[i]
+                    row += [
+                        trial.get("shape", ""),
+                        trial.get("color", ""),
+                        trial.get("time", ""),
+                        trial.get("correct", "")
+                    ]
+                else:
+                    row += ["", "", "", ""]
+
+            writer.writerow(row)
+
+        except Exception as e:
+            print(f"Skipping row {r.id} due to error: {e}")
+
+    csv_data = output.getvalue()
+    output.close()
 
     date = datetime.now()
-    return Response(generate(), mimetype="text/csv",
-        headers={"Content-Disposition": f"attachment;filename=combined_results_{date}.csv"})
+    return Response(
+        csv_data,
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=combined_results_{date}.csv"}
+    )
 
 if __name__ == "__main__":
     app.run()
