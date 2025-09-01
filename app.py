@@ -22,6 +22,13 @@ DBNAME = "maximumcryteker$mkba_database"
 app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql://{USERNAME}:{PASSWORD}@{HOST}/{DBNAME}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True,     # ping before using, auto-reconnect if dead
+    "pool_recycle": 280,       # recycle connections before MySQL kills them
+    "pool_size": 5,            # optional: small pool is fine on PA
+    "max_overflow": 10,        # optional
+}
+
 db = SQLAlchemy(app)
 
 # Table for questionnaire answers
